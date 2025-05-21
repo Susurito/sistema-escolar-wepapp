@@ -1,0 +1,129 @@
+<div class="wrapper">
+    <div class="header-registro">
+      <app-navbar [tipo]="tipo"></app-navbar>
+    </div>
+    <div class="section-registro">
+      <div class="body-registro">
+          <div class="container">
+
+            <div class="row mt-3 mb-3">
+              <div class="form-group col-12">
+                <label class="title-user" for="tipo_usuario">Ingresa los datos de los eventos academicos</label>
+              </div>
+            </div>
+            <!-- Aquí empiezan los campos del formulario -->
+            <!--Nombre-->
+            <mat-form-field class="mat-input form-field" appearance="outline">
+              <mat-label>Nombre del evento academico</mat-label>
+              <input matInput [(ngModel)]="evento.nombre_evento" placeholder="Escribe el nombre del evento academico" (keypress)="soloLetras($event)">
+            </mat-form-field>
+            <div *ngIf="errors.nombre_evento" class="invalid-feedback">{{ errors.nombre_evento }}</div>
+
+            <!--Tipo evento-->
+            <mat-form-field class="mat-input form-field" appearance="outline">
+              <mat-label>Tipo de evento</mat-label>
+              <mat-select [(ngModel)]="evento.tipo_evento">
+                <mat-option *ngFor="let tipos of tipos" [value]="tipos.viewValue">
+                  {{tipos.viewValue}}
+                </mat-option>
+              </mat-select>
+            </mat-form-field>
+            <div *ngIf="errors.tipo_evento" class="invalid-feedback">{{ errors.tipo_evento }}</div>
+
+
+            <!--Fecha de realizacion-->
+            <mat-form-field class="mat-input form-field" appearance="outline">
+              <mat-label>Fecha de realizacion</mat-label>
+              <input matInput [matDatepicker]="picker" [(ngModel)]="evento.fecha_evento" (focus)="picker.open()" placeholder="Agregar fecha" (dateChange)="changeFecha($event)" type="string">
+              <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+              <mat-datepicker #picker></mat-datepicker>
+            </mat-form-field>
+            <div *ngIf="errors.fecha_evento" class="invalid-feedback">{{ errors.fecha_evento }}</div>
+
+            <!--Reloj Inicio-->
+            <mat-form-field class="mat-input form-field" appearance="outline">
+              <mat-label>Hora de inicio</mat-label>
+              <input matInput [ngxTimepicker]="inicioPicker" readonly placeholder="Selecciona hora de inicio" [(ngModel)]="evento.hora_inicio" (ngModelChange)="changeHoraInicio($event)">
+              <ngx-material-timepicker #inicioPicker></ngx-material-timepicker>
+            </mat-form-field>
+            <div *ngIf="errors.hora_inicio" class="invalid-feedback">{{ errors.hora_inicio }}</div>
+
+            <!--Reloj Final-->
+            <mat-form-field class="mat-input form-field" appearance="outline">
+              <mat-label>Hora de final</mat-label>
+              <input matInput [ngxTimepicker]="finalPicker" readonly placeholder="Selecciona hora final" [(ngModel)]="evento.hora_final" (ngModelChange)="changeHoraFinal($event)" >
+              <ngx-material-timepicker #finalPicker></ngx-material-timepicker>
+            </mat-form-field>
+            <div *ngIf="errors.hora_final" class="invalid-feedback">{{ errors.hora_final }}</div>
+
+            <!--Lugar-->
+            <mat-form-field class="mat-input form-field" appearance="outline">
+              <mat-label>Lugar del evento</mat-label>
+              <input matInput [(ngModel)]="evento.lugar" placeholder="Escribe el lugar del evento" (keypress)="soloLetras($event)">
+            </mat-form-field>
+            <div *ngIf="errors.lugar" class="invalid-feedback">{{ errors.lugar }}</div>
+
+            <!--Publico-->
+            <div class="select-publico">
+              <div class="row mt-3 mb-3">
+                <div class="form-group col-12">
+                  <label class="title-publico" for="tipo_usuario">Selecciona el publico</label>
+                </div>
+              </div>
+              <div class="checkbox-group" *ngFor="let publico of publico; let i = index">
+                <mat-checkbox class="checkbox-item opc-sc" name="opsc" (change)="checkboxChange($event)" value="{{publico.nombre}}" [checked]="revisarSeleccion(publico.nombre)">
+                    <div class="d-checkbox-nombre">{{publico.nombre}}</div>
+                </mat-checkbox>
+              </div>
+              <div *ngIf="errors.publico_json" class="invalid-feedback">{{ errors.publico_json }}</div>
+            </div>
+
+            <!--Programa educativo-->
+            <ng-container *ngIf="esEstudiante">
+              <mat-form-field class="mat-input form-field" appearance="outline">
+                <mat-label>Programa educativo</mat-label>
+                <mat-select [(ngModel)]="evento.programa_educativo">
+                  <mat-option *ngFor="let programa of programa" [value]="programa.viewValue">
+                    {{programa.viewValue}}
+                  </mat-option>
+                </mat-select>
+              </mat-form-field>
+              <div *ngIf="errors.programa_educativo" class="invalid-feedback">{{ errors.programa_educativo }}</div>
+            </ng-container>
+
+            <!--Responsable de evento-->
+            <mat-form-field class="mat-input form-field" appearance="outline">
+              <mat-label>Responsable de evento</mat-label>
+              <mat-select [(ngModel)]="evento.responsable_evento">
+                <mat-option *ngFor="let responsable of responsable" [value]="responsable.nombre">
+                  {{ responsable.nombre }}
+                </mat-option>
+              </mat-select>
+            </mat-form-field>
+            <div *ngIf="errors.responsable_evento" class="invalid-feedback">{{ errors.responsable_evento }}</div>
+
+            <!--Descripcion-->
+            <mat-form-field class="mat-input form-field" appearance="outline">
+              <mat-label>Descripcion</mat-label>
+              <input matInput [(ngModel)]="evento.descripcion" placeholder="Escribe el nombre del evento academico" (keypress)="signosBasicos($event)">
+              <mat-hint align="end">{{evento.descripcion?.length || 0}}/300</mat-hint>
+            </mat-form-field>
+            <div *ngIf="errors.descripcion" class="invalid-feedback">{{ errors.descripcion }}</div>
+
+            <!--Cupo máximo de asistentes-->
+            <mat-form-field class="mat-input form-field" appearance="outline">
+              <mat-label>Cupo máximo de asistentes</mat-label>
+              <input matInput [(ngModel)]="evento.cupo" mask="000" [dropSpecialCharacters]="true" [validation]="false" placeholder="Escribe el cupo máximo">
+            </mat-form-field>
+            <div *ngIf="errors.cupo" class="invalid-feedback">{{ errors.cupo }}</div>
+
+            <div class="section-buttons">
+              <button class="btn btn-danger" (click)="regresar()">Cancelar</button>
+              <button *ngIf="!editar" class="btn btn-primary" type="submit" (click)="registrar()">Registrar</button>
+              <button *ngIf="editar" class="btn btn-primary" type="submit" (click)="actualizar()">Actualizar</button>
+            </div>
+          </div>
+      </div>
+    </div>
+</div>
+
